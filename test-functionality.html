@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Generator 功能測試</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 SQL Generator 功能測試</h1>
+    <p>此頁面用於測試 SQL Generator Chrome 擴充功能的核心功能</p>
+
+    <div class="test-section">
+        <h2>📊 測試資料表格</h2>
+        <p>以下表格用於測試擴充功能的表格檢測功能：</p>
+        
+        <table id="test-table-1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>電子郵件</th>
+                    <th>年齡</th>
+                    <th>註冊日期</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>張三</td>
+                    <td>zhang@example.com</td>
+                    <td>25</td>
+                    <td>2024-01-15</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>李四</td>
+                    <td>li@example.com</td>
+                    <td>30</td>
+                    <td>2024-02-20</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>王五</td>
+                    <td>wang@example.com</td>
+                    <td>28</td>
+                    <td>2024-03-10</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button onclick="highlightTable()">📍 高亮顯示表格</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 測試CSV資料</h2>
+        <p>複製以下CSV資料測試匯入功能：</p>
+        <pre id="csv-data">ID,產品名稱,價格,庫存,分類
+1,iPhone 15,32999,50,手機
+2,MacBook Pro,59999,25,筆電
+3,iPad Air,18999,100,平板
+4,Apple Watch,12999,75,穿戴
+5,AirPods Pro,7999,200,音響</pre>
+        
+        <button onclick="copyCSVData()">📋 複製CSV資料</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 測試JSON資料</h2>
+        <p>複製以下JSON資料測試匯入功能：</p>
+        <pre id="json-data">[
+  {"id": 1, "name": "管理員", "role": "admin", "active": true, "created_at": "2024-01-01"},
+  {"id": 2, "name": "編輯者", "role": "editor", "active": true, "created_at": "2024-01-15"},
+  {"id": 3, "name": "訪客", "role": "viewer", "active": false, "created_at": "2024-02-01"}
+]</pre>
+        
+        <button onclick="copyJSONData()">📋 複製JSON資料</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 執行測試</h2>
+        <button onclick="runAllTests()">🚀 執行所有測試</button>
+        <button onclick="clearResults()">🧹 清除結果</button>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📖 使用說明</h2>
+        <ol>
+            <li><strong>載入擴充功能</strong>：確保已在Chrome中載入SQL Generator擴充功能</li>
+            <li><strong>右鍵選單測試</strong>：在此頁面上右鍵，應該看到"SQL Generator"選項</li>
+            <li><strong>表格檢測</strong>：右鍵選擇"檢測頁面表格"，應該檢測到上方的測試表格</li>
+            <li><strong>資料複製測試</strong>：複製CSV或JSON資料，然後右鍵選擇"從選取文字生成SQL"</li>
+            <li><strong>擴充功能介面</strong>：點擊瀏覽器工具列中的SQL Generator圖示開啟主介面</li>
+        </ol>
+    </div>
+
+    <script>
+        function addTestResult(message, type = 'success') {
+            const results = document.getElementById('test-results');
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.textContent = message;
+            results.appendChild(result);
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        function highlightTable() {
+            const table = document.getElementById('test-table-1');
+            table.style.outline = '3px solid #667eea';
+            table.style.outlineOffset = '2px';
+            table.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+            
+            setTimeout(() => {
+                table.style.outline = '';
+                table.style.outlineOffset = '';
+                table.style.backgroundColor = '';
+            }, 3000);
+            
+            addTestResult('✨ 表格已高亮顯示（3秒後消失）', 'success');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                addTestResult('📋 資料已複製到剪貼簿', 'success');
+            }).catch(() => {
+                // 備用方案
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                addTestResult('📋 資料已複製到剪貼簿（備用方法）', 'warning');
+            });
+        }
+
+        function copyCSVData() {
+            const csvData = document.getElementById('csv-data').textContent;
+            copyToClipboard(csvData);
+        }
+
+        function copyJSONData() {
+            const jsonData = document.getElementById('json-data').textContent;
+            copyToClipboard(jsonData);
+        }
+
+        function runAllTests() {
+            clearResults();
+            addTestResult('🧪 開始執行功能測試...', 'success');
+
+            // 測試1: 檢查DOM結構
+            setTimeout(() => {
+                const table = document.getElementById('test-table-1');
+                if (table && table.rows.length > 1) {
+                    addTestResult('✅ 測試表格結構正確', 'success');
+                } else {
+                    addTestResult('❌ 測試表格結構異常', 'error');
+                }
+            }, 500);
+
+            // 測試2: 檢查CSV資料
+            setTimeout(() => {
+                const csvData = document.getElementById('csv-data').textContent;
+                if (csvData && csvData.includes('iPhone')) {
+                    addTestResult('✅ CSV測試資料正確', 'success');
+                } else {
+                    addTestResult('❌ CSV測試資料異常', 'error');
+                }
+            }, 1000);
+
+            // 測試3: 檢查JSON資料
+            setTimeout(() => {
+                const jsonData = document.getElementById('json-data').textContent;
+                try {
+                    const parsed = JSON.parse(jsonData);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        addTestResult('✅ JSON測試資料格式正確', 'success');
+                    } else {
+                        addTestResult('❌ JSON測試資料格式錯誤', 'error');
+                    }
+                } catch (e) {
+                    addTestResult('❌ JSON測試資料無法解析', 'error');
+                }
+            }, 1500);
+
+            // 測試4: 檢查瀏覽器支援
+            setTimeout(() => {
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    addTestResult('✅ Chrome擴充功能環境可用', 'success');
+                } else {
+                    addTestResult('⚠️ Chrome擴充功能環境不可用（正常，因為這是網頁環境）', 'warning');
+                }
+            }, 2000);
+
+            setTimeout(() => {
+                addTestResult('🎉 測試完成！現在可以測試擴充功能功能', 'success');
+            }, 2500);
+        }
+
+        // 頁面載入時顯示歡迎訊息
+        window.onload = function() {
+            setTimeout(() => {
+                addTestResult('🚀 SQL Generator 測試頁面已載入', 'success');
+                addTestResult('💡 請右鍵點擊此頁面測試擴充功能的右鍵選單功能', 'warning');
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

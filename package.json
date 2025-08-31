@@ -1,0 +1,115 @@
+{
+  "name": "sql-generator-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for generating bulk SQL INSERT and UPDATE statements",
+  "main": "background.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development --watch",
+    "test": "jest",
+    "lint": "eslint popup.js background.js content.js",
+    "lint:fix": "eslint popup.js background.js content.js --fix",
+    "format": "prettier --write \"**/*.{js,json,html,css,md}\"",
+    "clean": "rimraf dist",
+    "zip": "npm run build && zip -r sql-generator-extension.zip manifest.json popup.html popup.js background.js content.js css/ icons/ -x \"*.map\"",
+    "serve": "web-ext run --source-dir=. --start-url=chrome://extensions/"
+  },
+  "keywords": [
+    "chrome-extension",
+    "sql-generator",
+    "database",
+    "bulk-operations",
+    "insert",
+    "update"
+  ],
+  "author": {
+    "name": "SQL Generator Team",
+    "email": "support@sqlgenerator.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqlgenerator/chrome-extension.git"
+  },
+  "homepage": "https://github.com/sqlgenerator/chrome-extension#readme",
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@types/chrome": "^0.0.250",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^6.8.1",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "html-webpack-plugin": "^5.5.3",
+    "jest": "^27.5.1",
+    "jest-chrome": "^0.8.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
+    "web-ext": "^7.8.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "papaparse": "^5.4.1"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["jest-chrome/jest-chrome"],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!dist/**",
+      "!webpack.config.js",
+      "!jest.config.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "webextensions": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "prettier"
+    ],
+    "plugins": ["prettier"],
+    "rules": {
+      "prettier/prettier": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "prefer-const": "error",
+      "no-var": "error"
+    },
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "globals": {
+      "chrome": "readonly",
+      "browser": "readonly"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>模組載入測試</title>
+</head>
+<body>
+    <h1>模組載入測試 - 語法錯誤修復後</h1>
+    <div id="test-results"></div>
+    
+    <!-- 載入模組 -->
+    <script src="js/csv-parser.js"></script>
+    <script src="js/field-mapper.js"></script>
+    <script src="js/sql-generator.js"></script>
+    <script src="js/export-manager.js"></script>
+    
+    <script>
+        const testResults = document.getElementById('test-results');
+        let results = [];
+        
+        // 測試每個模組
+        try {
+            // 測試 CSVParser
+            if (typeof CSVParser !== 'undefined') {
+                const csvParser = new CSVParser();
+                results.push('✅ CSVParser: 載入成功');
+            } else {
+                results.push('❌ CSVParser: 未定義');
+            }
+        } catch (error) {
+            results.push('❌ CSVParser: ' + error.message);
+        }
+        
+        try {
+            // 測試 FieldMapper
+            if (typeof FieldMapper !== 'undefined') {
+                const fieldMapper = new FieldMapper();
+                results.push('✅ FieldMapper: 載入成功');
+            } else {
+                results.push('❌ FieldMapper: 未定義');
+            }
+        } catch (error) {
+            results.push('❌ FieldMapper: ' + error.message);
+        }
+        
+        try {
+            // 測試 SQLGenerator
+            if (typeof SQLGenerator !== 'undefined') {
+                const sqlGenerator = new SQLGenerator();
+                results.push('✅ SQLGenerator: 載入成功');
+            } else {
+                results.push('❌ SQLGenerator: 未定義');
+            }
+        } catch (error) {
+            results.push('❌ SQLGenerator: ' + error.message);
+        }
+        
+        try {
+            // 測試 ExportManager
+            if (typeof ExportManager !== 'undefined') {
+                const exportManager = new ExportManager();
+                results.push('✅ ExportManager: 載入成功');
+            } else {
+                results.push('❌ ExportManager: 未定義');
+            }
+        } catch (error) {
+            results.push('❌ ExportManager: ' + error.message);
+        }
+        
+        // 顯示結果
+        testResults.innerHTML = '<pre>' + results.join('\n') + '</pre>';
+        
+        // 也輸出到控制台
+        console.log('模組測試結果:');
+        results.forEach(result => console.log(result));
+    </script>
+</body>
+</html>

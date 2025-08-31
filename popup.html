@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced Import SQL Generator</title>
+    <link rel="stylesheet" href="css/popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Enhanced Import SQL Generator</h1>
+        <p>CSV 檔案匯入與 SQL 語句生成</p>
+      </header>
+
+      <main>
+        <!-- Block 1: Database Name Input -->
+        <div class="block" id="database-block">
+          <div class="block-header">
+            <span class="block-number">1</span>
+            <h2>Database Configuration</h2>
+          </div>
+          <div class="block-content">
+            <div class="form-group">
+              <label for="database-name">Database Name:</label>
+              <input
+                type="text"
+                id="database-name"
+                placeholder="Enter database name"
+                required
+              />
+              <div class="validation-message" id="database-validation"></div>
+            </div>
+            <div class="form-group">
+              <label for="database-type">Database Type:</label>
+              <select id="database-type">
+                <option value="mysql">MySQL</option>
+                <option value="postgresql">PostgreSQL</option>
+                <option value="sqlite">SQLite</option>
+                <option value="sqlserver">SQL Server</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="table-name">Table Name:</label>
+              <input
+                type="text"
+                id="table-name"
+                placeholder="Enter table name (optional)"
+              />
+              <small>If empty, will use database name or filename</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 2: Operation Mode Selection -->
+        <div class="block" id="mode-block" style="display: none">
+          <div class="block-header">
+            <span class="block-number">2</span>
+            <h2>Operation Mode Selection</h2>
+          </div>
+          <div class="block-content">
+            <div class="mode-options">
+              <label class="mode-option">
+                <input
+                  type="radio"
+                  name="operation-mode"
+                  value="INSERT"
+                  id="mode-insert"
+                />
+                <div class="mode-card insert-mode">
+                  <div class="mode-icon">📊</div>
+                  <h3>INSERT Mode</h3>
+                  <p>Batch insert new records from CSV data</p>
+                </div>
+              </label>
+              <label class="mode-option">
+                <input
+                  type="radio"
+                  name="operation-mode"
+                  value="UPDATE"
+                  id="mode-update"
+                />
+                <div class="mode-card update-mode">
+                  <div class="mode-icon">🎯</div>
+                  <h3>UPDATE Mode</h3>
+                  <p>Update existing records with conditions</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 3: Template Download -->
+        <div id="template-update-block" style="display: none">
+          <div class="block">
+            <div class="block-header">
+              <span class="block-number">3</span>
+              <h2>Download Template</h2>
+            </div>
+            <div class="block-content">
+              <div class="template-info">
+                <p class="template-description" id="template-description"></p>
+                <div class="template-actions">
+                  <button id="download-template" class="download-btn" disabled>
+                    <span class="btn-icon">📥</span>
+                    Download CSV Template
+                  </button>
+                  <div class="template-status" id="template-status"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="block">
+            <div class="block-header">
+              <span class="block-number">4</span>
+              <h2>Upload File</h2>
+            </div>
+            <div class="block-content">
+              <div class="upload-area">
+                <input type="file" id="file-input" accept=".csv" hidden />
+                <div class="upload-zone" id="upload-zone">
+                  <div class="upload-icon">📁</div>
+                  <p>Click to select CSV file or drag and drop here</p>
+                  <p class="upload-hint">
+                    Maximum file size: 10MB • Supported formats: CSV
+                  </p>
+                </div>
+                <div class="file-info" id="file-info" style="display: none">
+                  <div class="file-details">
+                    <div class="file-item">
+                      <span class="label">File:</span>
+                      <span id="file-name"></span>
+                    </div>
+                    <div class="file-item">
+                      <span class="label">Size:</span>
+                      <span id="file-size"></span>
+                    </div>
+                    <div class="file-item">
+                      <span class="label">Type:</span>
+                      <span id="file-type">CSV</span>
+                    </div>
+                    <div class="file-item">
+                      <span class="label">Status:</span>
+                      <span id="file-status" class="status-ready">Ready</span>
+                    </div>
+                  </div>
+                  <div class="file-actions">
+                    <button id="remove-file" class="remove-btn">
+                      Remove File
+                    </button>
+                    <button id="validate-file" class="validate-btn">
+                      Validate File
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="upload-progress"
+                  id="upload-progress"
+                  style="display: none"
+                >
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                  </div>
+                  <p class="progress-text" id="progress-text">
+                    Processing file...
+                  </p>
+                </div>
+                <div
+                  class="validation-messages"
+                  id="validation-messages"
+                  style="display: none"
+                >
+                  <div class="validation-content" id="validation-content"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Block 4: File Upload -->
+        </div>
+
+        <!-- Block 5: File Preview (initially hidden) -->
+        <div class="block" id="preview-block" style="display: none">
+          <div class="block-header">
+            <span class="block-number">5</span>
+            <h2>File Preview</h2>
+          </div>
+          <div class="block-content">
+            <div class="preview-stats" id="preview-stats"></div>
+            <div class="preview-table-container">
+              <table class="preview-table" id="preview-table">
+                <thead id="preview-thead"></thead>
+                <tbody id="preview-tbody"></tbody>
+              </table>
+            </div>
+            <div class="preview-controls">
+              <button id="prev-page" class="nav-btn" disabled>Previous</button>
+              <span class="page-info" id="page-info">Page 1 of 1</span>
+              <button id="next-page" class="nav-btn" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 6: Processing Controls -->
+        <div class="block" id="process-block" style="display: none">
+          <div class="block-header">
+            <span class="block-number">6</span>
+            <h2>Processing Options</h2>
+          </div>
+          <div class="block-content">
+            <div class="processing-options">
+              <div class="option-group">
+                <label for="batch-size">Batch Size:</label>
+                <select id="batch-size">
+                  <option value="100">100 records</option>
+                  <option value="500" selected>500 records</option>
+                  <option value="1000">1000 records</option>
+                  <option value="5000">5000 records</option>
+                  <option value="all">All records</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="include-transaction" checked />
+                  Include transaction wrapper
+                </label>
+              </div>
+              <div class="option-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="include-comments" checked />
+                  Include comments
+                </label>
+              </div>
+              <div class="option-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="include-create-table" />
+                  Include CREATE TABLE statement
+                </label>
+              </div>
+              <div
+                class="option-group"
+                id="insert-mode-group"
+                style="display: none"
+              >
+                <label for="insert-mode">INSERT Mode:</label>
+                <select id="insert-mode">
+                  <option value="normal">Normal INSERT</option>
+                  <option value="ignore">
+                    INSERT IGNORE (skip duplicates)
+                  </option>
+                  <option value="update">
+                    INSERT ... ON DUPLICATE KEY UPDATE
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="process-summary" id="process-summary"></div>
+            <button id="generate-sql" class="generate-btn" disabled>
+              Generate SQL
+            </button>
+          </div>
+        </div>
+
+        <!-- Block 7: Results Output (initially hidden) -->
+        <div class="block" id="results-block" style="display: none">
+          <div class="block-header">
+            <span class="block-number">7</span>
+            <h2>Generated Results</h2>
+          </div>
+          <div class="block-content">
+            <div class="results-stats" id="results-stats"></div>
+            <div class="sql-output-container">
+              <div class="output-header">
+                <h3>Generated SQL</h3>
+                <div class="output-controls">
+                  <button id="copy-sql" class="control-btn">📋 Copy</button>
+                  <button id="download-sql" class="control-btn">
+                    💾 Download
+                  </button>
+                  <button id="clear-output" class="control-btn">
+                    🗑️ Clear
+                  </button>
+                </div>
+              </div>
+              <div class="sql-output" id="sql-output"></div>
+            </div>
+            <div class="restart-section">
+              <button id="restart-process" class="restart-btn">
+                🔄 Start Over
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div class="error-section" id="error-section" style="display: none">
+          <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            <span id="error-text"></span>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Load all module scripts first -->
+    <script src="js/csv-parser.js"></script>
+    <script src="js/field-mapper.js"></script>
+    <script src="js/sql-generator.js"></script>
+    <script src="js/export-manager.js"></script>
+
+    <!-- Load main application script last -->
+    <script src="popup.js"></script>
+  </body>
+</html>

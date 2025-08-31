@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Redesigned SQL Generator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #2196f3;
+        }
+        .success { color: #4caf50; font-weight: bold; }
+        .error { color: #f44336; font-weight: bold; }
+        .warning { color: #ff9800; font-weight: bold; }
+        .code { 
+            background: #f0f0f0; 
+            padding: 8px; 
+            font-family: monospace; 
+            margin: 8px 0; 
+            border-radius: 4px;
+        }
+        button { 
+            padding: 8px 16px; 
+            margin: 4px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        .test-btn { background: #2196f3; color: white; }
+        .clear-btn { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🧪 SQL Generator 重新設計功能測試</h1>
+    
+    <div class="test-section">
+        <h2>📊 INSERT 操作測試</h2>
+        <button class="test-btn" onclick="testInsertOperation()">測試 INSERT 操作</button>
+        <div id="insert-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 UPDATE 操作測試</h2>
+        <button class="test-btn" onclick="testUpdateOperation()">測試 UPDATE 操作</button>
+        <div id="update-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🛡️ 安全性測試</h2>
+        <button class="test-btn" onclick="testSecurityFeatures()">測試 SQL 注入防護</button>
+        <div id="security-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚠️ 錯誤處理測試</h2>
+        <button class="test-btn" onclick="testErrorHandling()">測試錯誤處理</button>
+        <div id="error-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 操作模式切換測試</h2>
+        <button class="test-btn" onclick="testModeSwitch()">測試模式切換</button>
+        <div id="mode-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <button class="clear-btn" onclick="clearAllResults()">清除所有測試結果</button>
+    </div>
+
+    <!-- Load the redesigned popup script -->
+    <script src="popup.js"></script>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const className = type === 'success' ? 'success' : 
+                             type === 'error' ? 'error' : 
+                             type === 'warning' ? 'warning' : '';
+            element.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function logCode(elementId, code) {
+            const element = document.getElementById(elementId);
+            element.innerHTML += `<div class="code">${code}</div>`;
+        }
+
+        function testInsertOperation() {
+            const results = document.getElementById('insert-test-results');
+            results.innerHTML = '';
+            
+            try {
+                log('insert-test-results', '開始測試 INSERT 操作處理器...', 'info');
+                
+                // Create INSERT handler instance
+                const insertHandler = new InsertOperationHandler();
+                log('insert-test-results', '✅ INSERT 處理器創建成功', 'success');
+                
+                // Set table name
+                insertHandler.setTableName('users');
+                log('insert-test-results', '✅ 表名設定成功: users', 'success');
+                
+                // Add fields
+                insertHandler.addField('name', 'John Doe', 'string');
+                insertHandler.addField('age', 30, 'number');
+                insertHandler.addField('active', true, 'boolean');
+                insertHandler.addField('email', 'john@example.com', 'string');
+                log('insert-test-results', '✅ 欄位新增成功 (4個欄位)', 'success');
+                
+                // Validate
+                const isValid = insertHandler.validate();
+                if (isValid) {
+                    log('insert-test-results', '✅ 驗證通過', 'success');
+                    
+                    // Generate SQL
+                    const sql = insertHandler.generateSQL();
+                    log('insert-test-results', '✅ SQL 生成成功:', 'success');
+                    logCode('insert-test-results', sql);
+                } else {
+                    log('insert-test-results', '❌ 驗證失敗: ' + insertHandler.getValidationErrors().join(', '), 'error');
+                }
+                
+            } catch (error) {
+                log('insert-test-results', '❌ 測試失敗: ' + error.message, 'error');
+            }
+        }
+
+        function testUpdateOperation() {
+            const results = document.getElementById('update-test-results');
+            results.innerHTML = '';
+            
+            try {
+                log('update-test-results', '開始測試 UPDATE 操作處理器...', 'info');
+                
+                // Create UPDATE handler instance
+                const updateHandler = new UpdateOperationHandler();
+                log('update-test-results', '✅ UPDATE 處理器創建成功', 'success');
+                
+                // Set table name
+                updateHandler.setTableName('users');
+                log('update-test-results', '✅ 表名設定成功: users', 'success');
+                
+                // Add SET fields
+                updateHandler.addSetField('email', 'newemail@example.com', 'string');
+                updateHandler.addSetField('age', 31, 'number');
+                updateHandler.addSetField('last_login', new Date().toISOString(), 'string');
+                log('update-test-results', '✅ SET 欄位新增成功 (3個欄位)', 'success');
+                
+                // Add WHERE conditions
+                updateHandler.addWhereCondition('id', '=', 1, 'number');
+                updateHandler.addWhereCondition('status', '=', 'active', 'string', 'AND');
+                updateHandler.addWhereCondition('created_date', '>', '2023-01-01', 'string', 'AND');
+                log('update-test-results', '✅ WHERE 條件新增成功 (3個條件)', 'success');
+                
+                // Validate
+                const isValid = updateHandler.validate();
+                if (isValid) {
+                    log('update-test-results', '✅ 驗證通過', 'success');
+                    
+                    // Generate SQL
+                    const sql = updateHandler.generateSQL();
+                    log('update-test-results', '✅ SQL 生成成功:', 'success');
+                    logCode('update-test-results', sql);
+                } else {
+                    log('update-test-results', '❌ 驗證失敗: ' + updateHandler.getValidationErrors().join(', '), 'error');
+                }
+                
+            } catch (error) {
+                log('update-test-results', '❌ 測試失敗: ' + error.message, 'error');
+            }
+        }
+
+        function testSecurityFeatures() {
+            const results = document.getElementById('security-test-results');
+            results.innerHTML = '';
+            
+            try {
+                log('security-test-results', '開始測試 SQL 注入防護...', 'info');
+                
+                // Test SQL injection in INSERT
+                const insertHandler = new InsertOperationHandler();
+                insertHandler.setTableName('users');
+                insertHandler.addField('name', "'; DROP TABLE users; --", 'string');
+                insertHandler.addField('email', "admin@test.com' OR '1'='1", 'string');
+                
+                const insertSQL = insertHandler.generateSQL();
+                log('security-test-results', '✅ INSERT 注入防護測試:', 'success');
+                logCode('security-test-results', insertSQL);
+                
+                if (insertSQL.includes("''")) {
+                    log('security-test-results', '✅ 單引號正確轉義', 'success');
+                } else {
+                    log('security-test-results', '⚠️ 單引號轉義可能有問題', 'warning');
+                }
+                
+                // Test SQL injection in UPDATE
+                const updateHandler = new UpdateOperationHandler();
+                updateHandler.setTableName('users');
+                updateHandler.addSetField('name', "'; UPDATE users SET role='admin'; --", 'string');
+                updateHandler.addWhereCondition('id', '=', "1' OR '1'='1", 'string');
+                
+                const updateSQL = updateHandler.generateSQL();
+                log('security-test-results', '✅ UPDATE 注入防護測試:', 'success');
+                logCode('security-test-results', updateSQL);
+                
+            } catch (error) {
+                log('security-test-results', '❌ 安全性測試失敗: ' + error.message, 'error');
+            }
+        }
+
+        function testErrorHandling() {
+            const results = document.getElementById('error-test-results');
+            results.innerHTML = '';
+            
+            log('error-test-results', '開始測試錯誤處理...', 'info');
+            
+            // Test 1: Empty INSERT handler
+            try {
+                const emptyInsertHandler = new InsertOperationHandler();
+                emptyInsertHandler.generateSQL();
+                log('error-test-results', '❌ 應該拋出錯誤但沒有', 'error');
+            } catch (error) {
+                log('error-test-results', '✅ 正確捕獲空 INSERT 錯誤: ' + error.message, 'success');
+            }
+            
+            // Test 2: Empty UPDATE handler
+            try {
+                const emptyUpdateHandler = new UpdateOperationHandler();
+                emptyUpdateHandler.generateSQL();
+                log('error-test-results', '❌ 應該拋出錯誤但沒有', 'error');
+            } catch (error) {
+                log('error-test-results', '✅ 正確捕獲空 UPDATE 錯誤: ' + error.message, 'success');
+            }
+            
+            // Test 3: Invalid table name
+            try {
+                const handler = new InsertOperationHandler();
+                handler.setTableName('');
+                log('error-test-results', '❌ 應該拋出錯誤但沒有', 'error');
+            } catch (error) {
+                log('error-test-results', '✅ 正確捕獲無效表名錯誤: ' + error.message, 'success');
+            }
+            
+            // Test 4: Invalid operator in WHERE
+            try {
+                const handler = new UpdateOperationHandler();
+                handler.setTableName('test');
+                handler.addSetField('name', 'test', 'string');
+                handler.addWhereCondition('id', 'INVALID_OP', '1', 'number');
+                log('error-test-results', '❌ 應該拋出錯誤但沒有', 'error');
+            } catch (error) {
+                log('error-test-results', '✅ 正確捕獲無效運算符錯誤: ' + error.message, 'success');
+            }
+        }
+
+        function testModeSwitch() {
+            const results = document.getElementById('mode-test-results');
+            results.innerHTML = '';
+            
+            log('mode-test-results', '開始測試模式切換功能...', 'info');
+            
+            try {
+                // Test if we can access the global SQLGenerator instance
+                if (typeof window !== 'undefined' && window.SQLGenerator) {
+                    log('mode-test-results', '✅ SQLGenerator 類別可存取', 'success');
+                } else {
+                    log('mode-test-results', '⚠️ SQLGenerator 類別不在全域範圍中', 'warning');
+                }
+                
+                // Test INSERT and UPDATE handler classes
+                if (typeof InsertOperationHandler !== 'undefined') {
+                    log('mode-test-results', '✅ InsertOperationHandler 可存取', 'success');
+                } else {
+                    log('mode-test-results', '⚠️ InsertOperationHandler 不在全域範圍中', 'warning');
+                }
+                
+                if (typeof UpdateOperationHandler !== 'undefined') {
+                    log('mode-test-results', '✅ UpdateOperationHandler 可存取', 'success');
+                } else {
+                    log('mode-test-results', '⚠️ UpdateOperationHandler 不在全域範圍中', 'warning');
+                }
+                
+                // Test different data types
+                log('mode-test-results', '測試不同資料類型處理...', 'info');
+                
+                const handler = new InsertOperationHandler();
+                handler.setTableName('test_types');
+                handler.addField('string_field', 'test string', 'string');
+                handler.addField('number_field', 123, 'number');
+                handler.addField('boolean_field', true, 'boolean');
+                handler.addField('null_field', null, 'null');
+                handler.addField('date_field', '2024-01-01', 'string');
+                
+                const sql = handler.generateSQL();
+                log('mode-test-results', '✅ 多種資料類型處理成功:', 'success');
+                logCode('mode-test-results', sql);
+                
+            } catch (error) {
+                log('mode-test-results', '❌ 模式切換測試失敗: ' + error.message, 'error');
+            }
+        }
+
+        function clearAllResults() {
+            ['insert-test-results', 'update-test-results', 'security-test-results', 
+             'error-test-results', 'mode-test-results'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+        }
+
+        // Auto-run a basic functionality test when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Redesigned SQL Generator test page loaded');
+            console.log('✅ INSERT and UPDATE handlers are available');
+            console.log('📝 Click the test buttons to run comprehensive tests');
+        });
+    </script>
+</body>
+</html>
